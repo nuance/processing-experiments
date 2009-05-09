@@ -11,8 +11,16 @@
               center = transport.responseText.evalJSON(true);
             }
           });
-        }, 0.5);
+        }, 2.0);
+
       center = {"x": 100, "y": 100};
+
+      var sendMouseClick = function(x, y) {
+        new Ajax.Request('http://127.0.0.1:8080/click?' + $H({x: x, y: y}).toQueryString(),
+          {
+            method:'get'
+          });
+      };
     </script>
     <script src="init.js"></script>
   </head>
@@ -56,6 +64,11 @@
           lastMouseY = center.y;
           $('framerate').update(curFrameRate);
         }
+
+        void mousePressed() {
+          sendMouseClick(mouseX, mouseY);
+        }
+
       </script>
       <canvas width="750" height="750"/>
     </div>
