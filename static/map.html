@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script type="text/javascript" src="prototype-1.6.0.3.js"></script>
+    <script type="text/javascript" src="processing.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      new PeriodicalExecuter(function(pe) {
+        new Ajax.Request('/center',
+          {
+            method:'get',
+            onSuccess: function(transport){
+              center = transport.responseText.evalJSON(true);
+            }
+          });
+        }, 0.5);
+
+      // Framerate updater
+      frames = 0;
+      new PeriodicalExecuter(function(pe) {
+        $('framerate').update(frames);
+        frames = 0;
+      }, 1.0);
+
+      center = {"x": 100, "y": 100};
+
+      var sendMouseClick = function(x, y) {
+        new Ajax.Request('/click?' + $H({x: x, y: y}).toQueryString(),
+          {
+            method:'get'
+          });
+      };
+    </script>
+    <script src="init.js"></script>
+  </head>
+  <body>
+    Demo:
+    <div class="demo">
+      <script type="application/processing">
+        // All Examples Written by Casey Reas and Ben Fry
+        // unless otherwise stated.
+        float max_distance;
+
+        void setup() {
+          size(250, 250);
+          smooth();
+          noStroke();
+          max_distance = dist(0, 0, width, height);
+          frameRate(30);
+        }
+
+        lastMouseX = 0;
+        lastMouseY = 0;
+
+        void draw() 
+        {
+          if (center.x == lastMouseX && center.y == lastMouseY) {
+            return;
+          }
+
+          frames += 1;
+          background(51);
+
+          for(int i = 0; i <= width; i += 20) {
+            for(int j = 0; j <= width; j += 20) {
+              float size = dist(center.x, center.y, i, j);
+              size = size/max_distance * 66;
+              ellipse(i, j, size, size);
+            }
+          }
+        
+          lastMouseX = center.x;
+          lastMouseY = center.y;
+        }
+
+        void mousePressed() {
+          sendMouseClick(mouseX, mouseY);
+        }
+
+      </script>
+      <canvas width="250" height="250"/>
+    </div>
+    Framerate: <span id="framerate"></span>
+  </body>
+</html>

@@ -16,8 +16,8 @@ class center:
 		cnt['x'] += 25
 		cnt['y'] += 25
 		
-		cnt['x'] = cnt['x'] % 750
-		cnt['y'] = cnt['y'] % 750
+		cnt['x'] = cnt['x'] % 250
+		cnt['y'] = cnt['y'] % 250
 
 		return json.dumps(cnt)
 		
