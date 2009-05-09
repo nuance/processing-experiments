@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <script type="text/javascript" src="prototype-1.6.0.3.js"></script>
+    <script type="text/javascript" src="processing.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      new PeriodicalExecuter(function(pe) {
+        new Ajax.Request('http://127.0.0.1:8080/center',
+          {
+            method:'get',
+            onSuccess: function(transport){
+              center = transport.responseText.evalJSON(true);
+            }
+          });
+        }, 0.5);
+      center = {"x": 100, "y": 100};
+    </script>
+    <script src="init.js"></script>
+  </head>
+  <body>
+    Demo:
+    <div class="demo">
+      <script type="application/processing">
+        // All Examples Written by Casey Reas and Ben Fry
+        // unless otherwise stated.
+        float max_distance;
+
+        void setup() {
+          size(750, 750); 
+          smooth();
+          noStroke();
+          max_distance = dist(0, 0, width, height);
+          frameRate(30);
+          
+        }
+
+        lastMouseX = 0;
+        lastMouseY = 0;
+
+        void draw() 
+        {
+          if (center.x == lastMouseX && center.y == lastMouseY) {
+            $('framerate').update(0);
+            return;
+          }
+          background(51);
+
+          for(int i = 0; i <= width; i += 20) {
+            for(int j = 0; j <= width; j += 20) {
+              float size = dist(center.x, center.y, i, j);
+              size = size/max_distance * 66;
+              ellipse(i, j, size, size);
+            }
+          }
+        
+          lastMouseX = center.x;
+          lastMouseY = center.y;
+          $('framerate').update(curFrameRate);
+        }
+      </script>
+      <canvas width="750" height="750"/>
+    </div>
+    Framerate: <span id="framerate"></span>
+  </body>
+</html>

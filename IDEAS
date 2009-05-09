@@ -1,0 +1,8 @@
+# -*- mode:org -*-
+* Access log visualizer
+** Backend
+*** Apache log parser + geoip => lat/long/time rows
+*** Historic data + recent cache
+** Frontend
+*** Processing map w/ lat-long "pops", background shade is historic data
+*** Live data loaded via ajax
