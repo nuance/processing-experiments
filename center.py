@@ -21,8 +21,8 @@ class center:
 		delta['x'] += random.randint(-5, 5)
 		delta['y'] += random.randint(-5, 5)
 		
-		cnt['x'] = cnt['x'] % 250
-		cnt['y'] = cnt['y'] % 250
+		cnt['x'] = cnt['x'] % 750
+		cnt['y'] = cnt['y'] % 750
 
 		return json.dumps(cnt)
 		
@@ -33,6 +33,8 @@ class reset:
 class click:
 	def GET(self):
 		form = web.input(x=0, y=0)
+		delta['x'] = int(form.x) - cnt['x']
+		delta['y'] = int(form.y) - cnt['y']
 		cnt['x'] = int(form.x)
 		cnt['y'] = int(form.y)
 
