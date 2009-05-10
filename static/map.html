@@ -6,15 +6,17 @@
     <script type="text/javascript" src="prototype-1.6.0.3.js"></script>
     <script type="text/javascript" src="processing.js" charset="utf-8"></script>
     <script type="text/javascript">
-      // new PeriodicalExecuter(function(pe) {
-      //   new Ajax.Request('/center',
-      //     {
-      //       method:'get',
-      //       onSuccess: function(transport){
-      //         center = transport.responseText.evalJSON(true);
-      //       }
-      //     });
-      //   }, 0.5);
+      new PeriodicalExecuter(function(pe) {
+        new Ajax.Request('/center',
+          {
+            method:'get',
+            onSuccess: function(transport){
+              var point = transport.responseText.evalJSON(true);
+              var point_s = points
+              point_s.add([{x: point.x, y: point.y}]);
+            }
+          });
+        }, 0.5);
 
       // Framerate updater
       frames = 0;
@@ -42,7 +44,6 @@
         // unless otherwise stated.
         float max_distance;
         int last_length;
-        ArrayList points;
 
         void setup() {
           size(250, 250);
@@ -62,7 +63,16 @@
 
           int toRemove = -1;
           for (var i = points.length - 1; i >= 0; i--){
-            float size = max(10.0 - float(frameCount - points[i][1]) / 30, 100 - (frameCount - points[i][1]));
+            var point = points[i][0];
+            
+            int frame = frameCount;
+            if (points[i].length > 1) {
+              frame = points[i][1];
+            } else {
+              points[i] = [point, frame];
+            };
+
+            float size = max(10.0 - float(frameCount - points[i][1]) / 30, 50 - (frameCount - points[i][1]));
 
             if (size < 1.0) {
               toRemove = i;
