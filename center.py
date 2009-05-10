@@ -1,47 +1,63 @@
 from __future__ import with_statement
 import json
-import random
+from random import randint
 
 import web
 
 urls = (
     '/center', 'center',
-    '/reset', 'reset',
+    '/create', 'create',
 	'/click', 'click'
 )
 app = web.application(urls, globals())
 
-cnts = [{'x': 0, 'y': 0}]
-deltas = [{'x': 10, 'y': 10}]
+class Runner(object):
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+
+		self.dx = randint(-10, 10)
+		self.dy = randint(-10, 10)
+
+	def move(self):
+		self.x += self.dx
+		self.y += self.dy
+
+		self.dx = max(-10, min(10, randint(-5, 5) + self.dx))
+		self.dy = max(-10, min(10, randint(-5, 5) + self.dy))
+
+		self.x = self.x % 750
+		self.y = self.y % 750
+
+	def poke(self, x, y):
+		self.dx = max(-10, min(10, x - self.x))
+		self.dy = max(-10, min(10, y - self.y))
+
+	@property
+	def point(self):
+		return {'x': self.x, 'y': self.y}
+
+runners = {}
 
 class center:
 	def GET(self):
-		for cnt, delta in zip(cnts, deltas):
-			cnt['x'] += delta['x']
-			cnt['y'] += delta['y']
+		for runner in runners.itervalues():
+			runner.move()
 
-			delta['x'] = max(-10, min(10, random.randint(-5, 5) + delta['x']))
-			delta['y'] = max(-10, min(10, random.randint(-5, 5) + delta['y']))
+		return json.dumps([r.point for r in runners.itervalues()])
 
-			cnt['x'] = cnt['x'] % 750
-			cnt['y'] = cnt['y'] % 750
-
-		return json.dumps(cnts)
-
-class reset:
+class create:
 	def GET(self):
-		cnt = {'x': 100, 'y': 100}
+		runners[len(runners)] = (Runner(randint(-5, 5), randint(-5, 5)))
 
 class click:
 	def GET(self):
 		form = web.input(x=0, y=0)
+		x = int(form.x)
+		y = int(form.y)
 
-		for cnt, delta in zip(cnts, deltas):
-			delta['x'] = max(-10, min(10, int(form.x) - cnt['x']))
-			delta['y'] = max(-10, min(10, int(form.y) - cnt['y']))
-
-		cnts.append({'x': int(form.x), 'y': int(form.y)})
-		deltas.append({'x': random.randint(-10, 10), 'y': random.randint(-10, 10)})
+		for runner in runners.itervalues():
+			runner.poke(x, y)
 
 if __name__ == "__main__":
 	app.run()

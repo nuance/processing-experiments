@@ -6,6 +6,10 @@
     <script type="text/javascript" src="prototype-1.6.0.3.js"></script>
     <script type="text/javascript" src="processing.js" charset="utf-8"></script>
     <script type="text/javascript">
+
+      // Create a runner
+      new Ajax.Request('/create', {method:'get'});
+
       new PeriodicalExecuter(function(pe) {
         new Ajax.Request('/center',
           {
