@@ -11,9 +11,10 @@
           {
             method:'get',
             onSuccess: function(transport){
-              var point = transport.responseText.evalJSON(true);
-              var point_s = points
-              point_s.add([{x: point.x, y: point.y}]);
+              var updated_points = transport.responseText.evalJSON(true);
+              for (var p = updated_points.length - 1; p >= 0; p--){
+                points.add([{x: updated_points[p].x, y: updated_points[p].y}]);
+              };
             }
           });
         }, 0.5);
