@@ -6,15 +6,15 @@
     <script type="text/javascript" src="prototype-1.6.0.3.js"></script>
     <script type="text/javascript" src="processing.js" charset="utf-8"></script>
     <script type="text/javascript">
-      new PeriodicalExecuter(function(pe) {
-        new Ajax.Request('/center',
-          {
-            method:'get',
-            onSuccess: function(transport){
-              center = transport.responseText.evalJSON(true);
-            }
-          });
-        }, 0.5);
+      // new PeriodicalExecuter(function(pe) {
+      //   new Ajax.Request('/center',
+      //     {
+      //       method:'get',
+      //       onSuccess: function(transport){
+      //         center = transport.responseText.evalJSON(true);
+      //       }
+      //     });
+      //   }, 0.5);
 
       // Framerate updater
       frames = 0;
@@ -41,46 +41,54 @@
         // All Examples Written by Casey Reas and Ben Fry
         // unless otherwise stated.
         float max_distance;
+        int last_length;
+        ArrayList points;
 
         void setup() {
           size(250, 250);
           smooth();
           noStroke();
           max_distance = dist(0, 0, width, height);
+          points = new ArrayList();
+          last_length = 0;
           frameRate(30);
         }
 
-        lastMouseX = 0;
-        lastMouseY = 0;
-
         void draw() 
         {
-          if (center.x == lastMouseX && center.y == lastMouseY) {
-            return;
-          }
-
+          last_length = points.length;
           frames += 1;
           background(51);
 
-          for(int i = 0; i <= width; i += 20) {
-            for(int j = 0; j <= width; j += 20) {
-              float size = dist(center.x, center.y, i, j);
-              size = size/max_distance * 66;
-              ellipse(i, j, size, size);
+          int toRemove = -1;
+          for (var i = points.length - 1; i >= 0; i--){
+            float size = max(10.0 - float(frameCount - points[i][1]) / 30, 100 - (frameCount - points[i][1]));
+
+            if (size < 1.0) {
+              toRemove = i;
             }
+
+            ellipse(points[i][0].x, points[i][0].y, size, size);
+          };
+
+          if (toRemove != -1) {
+            for (var r = toRemove; r >= 0; r--){
+              points.remove(r);
+            };
           }
-        
-          lastMouseX = center.x;
-          lastMouseY = center.y;
+          
+          $('points').update(points.toJSON());
         }
 
         void mousePressed() {
           sendMouseClick(mouseX, mouseY);
+          points.add([{x: mouseX, y: mouseY}, frameCount]);
         }
 
       </script>
       <canvas width="250" height="250"/>
     </div>
     Framerate: <span id="framerate"></span>
+    Points: <span id="points"></span>
   </body>
 </html>
