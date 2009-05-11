@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from itertools import chain
 import json
+from math import sqrt
 from random import randint
 
 import web
@@ -31,8 +32,19 @@ class Runner(object):
 		self.y = self.y % 750
 
 	def poke(self, x, y):
-		self.dx = max(-10, min(10, x - self.x))
-		self.dy = max(-10, min(10, y - self.y))
+		dx = x - self.x
+		dy = y - self.y
+
+		if abs(dx) > 10 or abs(dy) > 10:
+			scale = 10.0 / sqrt(float(dx)**2 + float(dy)**2)
+		else:
+			scale = 1.0
+
+		dx *= scale
+		dy *= scale
+
+		self.dx = dx
+		self.dy = dy
 
 	@property
 	def point(self):
@@ -61,7 +73,7 @@ class create:
 		client = web.cookies().get("client")
 		if client == None:
 			client = len(runners)
-			web.setcookie('client', client, 300)
+			web.setcookie('client', client)
 
 		runners[client] = (Runner(randint(-5, 5), randint(-5, 5)))
 
